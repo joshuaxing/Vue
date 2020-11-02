@@ -8,13 +8,13 @@
 -->
 <template>
   <div>
-    <input :value="value" @input="onInput" v-bind="$attrs" type="text"/>
+    <input :value="value" @input="onInput" v-bind="$attrs" type="text" />
   </div>
 </template>
 
 <script>
 export default {
-  inheritAttrs: false,  // 避免顶层容器继承属性
+  inheritAttrs: false, // 避免顶层容器继承属性
   props: {
     value: {
       type: String,
@@ -35,5 +35,4 @@ export default {
 };
 </script>
 
-<style>
-</style>
+<style></style>

@@ -1,14 +1,14 @@
 /*
  * @Author: your name
  * @Date: 2020-10-23 17:15:41
- * @LastEditTime: 2020-10-26 18:09:32
- * @LastEditors: your name
+ * @LastEditTime: 2020-10-30 13:35:43
+ * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \vue-compontents\src\main.js
  */
 import Vue from "vue";
 import App from "./App.vue";
-import router from "./router";
+import router from "./router/krouter";
 import store from "./store";
 
 Vue.config.productionTip = false;
