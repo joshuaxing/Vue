@@ -1,19 +1,15 @@
 /*
  * @Author: your name
- * @Date: 2020-11-04 09:03:16
- * @LastEditTime: 2020-11-06 16:49:37
+ * @Date: 2020-11-04 11:34:05
+ * @LastEditTime: 2020-11-06 16:32:03
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
- * @FilePath: \vue-compontents\src\store\kstore.js
+ * @FilePath: \vue-compontents\src\store\count.js
  */
-import Vue from "vue";
-import KVuex from "./kvuex";
-
-Vue.use(KVuex);
-
-const store = new KVuex.Store({
+export default {
+  namespaced: true,
   state: {
-    count: 0,
+    count: 0
   },
   mutations: {
     add(state, num = 1) {
@@ -24,6 +20,12 @@ const store = new KVuex.Store({
     score(state) {
       return "score:" + state.count;
     },
+    getparentcount (state, getters, rootState) {
+      return rootState.amount
+    },
+    getbrothercount (state, getters, rootState) {
+      return rootState.amoutstore.count
+    }
   },
   actions: {
     // 复杂业务逻辑，类似于controller
@@ -37,6 +39,4 @@ const store = new KVuex.Store({
       });
     },
   },
-});
-
-export default store;
+};
