@@ -1,0 +1,44 @@
+<!--
+ * @Author: your name
+ * @Date: 2020-11-16 09:31:11
+ * @LastEditTime: 2020-11-16 09:41:53
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: \vue-compontents\kvue-o\index.html
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script> -->
+<script src="./vue.js"></script>
+
+<body>
+    <div id="app">
+        <form>
+            <input type="text" v-model="number">
+            <button type="button" @click="increment">增加</button>
+        </form>
+        <h3 v-text="number"></h3>
+        {{number}}
+    </div>
+    <script>
+        const vm = new Vue({
+            el: '#app',
+            data: {
+                number: 0
+            },
+            methods: {
+                increment: function () {
+                    this.number++;
+                },
+            }
+        })
+    </script>
+</body>
+
+</html>

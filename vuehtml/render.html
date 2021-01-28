@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Render函数</title>
+    <script src="https://unpkg.com/vue@next"></script>
+</head>
+
+<body>
+    <div id="app">
+        <anchored-heading :level="1">
+            <div>level1</div>
+        </anchored-heading>
+        <anchored-heading :level="2">
+            <div>level2</div>
+        </anchored-heading>
+        <hr/>
+        <!-- v-if/v-for-->
+        <ul-component :items="items"></ul-component>
+        <hr/>
+        <!-- v-model -->
+        <input-component v-model="nikename" placeholder="请输入" name="name"></input-component>
+        <hr/>
+        <!-- 修饰符 -->
+        <event-component></event-component>
+        <hr/>
+    </div>
+    <script>
+        const app = Vue.createApp({
+            data() {
+                return {
+                    items: [{
+                        id: 1,
+                        name: 'li1'
+                    }, {
+                        id: 2,
+                        name: 'li2'
+                    }],
+                    nikename: 'wwwwwwwww'
+                }
+            },
+            watch: {
+                nikename (val, oldVal) {
+                    console.log(val)
+                }
+            }
+        })
+
+        /** Recursively get text from children nodes */
+        function getChildrenTextContent(children) {
+            return children
+                .map(node => {
+                    return typeof node.children === 'string' ?
+                        node.children :
+                        Array.isArray(node.children) ?
+                        getChildrenTextContent(node.children) :
+                        ''
+                })
+                .join('')
+        }
+
+        app.component('anchored-heading', {
+            render() {
+                // create kebab-case id from the text contents of the children
+                const headingId = getChildrenTextContent(this.$slots.default())
+                    .toLowerCase()
+                    .replace(/\W+/g, '-') // replace non-word characters with dash
+                    .replace(/(^-|-$)/g, '') // remove leading and trailing dashes
+
+                return Vue.h('h' + this.level, [
+                    Vue.h(
+                        'a', {
+                            name: headingId,
+                            href: '#' + headingId
+                        },
+                        this.$slots.default()
+                    ),
+                    Vue.h(
+                        'p', {
+                            title: 'p标签'
+                        },
+                        [
+                            Vue.h('span', 'span标签')
+                        ]
+                    ),
+                    Vue.h('div',
+                        Array.apply(null, {
+                            length: 5
+                        }).map(() => {
+                            return Vue.h('p', 'hi')
+                        })
+                    )
+                ])
+            },
+            props: {
+                level: {
+                    type: Number,
+                    required: true
+                }
+            }
+        })
+
+        app.component('ul-component', {
+            props: ['items'],
+            render() {
+                if (this.items.length) {
+                    return Vue.h('ul', this.items.map((item) => Vue.h('li', item.name)))
+                } else {
+                    return Vue.h('p', 'No items found.')
+                }
+            }
+        })
+        
+        app.component('input-component', {
+            props: ['modelValue'],
+            render() {
+                return Vue.h('input', {
+                    ...this.$attrs,
+                    value: this.modelValue,
+                    onInput: $event => this.$emit('update:modelValue', $event.target.value)
+                })
+            }
+        })
+
+        app.component('event-component', {
+            render () {
+                return Vue.h('input', {
+                    onKeyUp: event => {
+                        // 如果触发事件的元素不是事件绑定的元素
+                        // 则返回
+                        if (event.target !== event.currentTarget) return
+                        // 如果向上键不是回车键，则中止
+                        // 没有同时按下按键 (13) 和 shift 键
+                        if (!event.shiftKey || event.keyCode !== 13) return
+                        // 停止事件传播
+                        event.stopPropagation()
+                        // 阻止该元素默认的 keyup 事件
+                        event.preventDefault()
+                        // ...
+                    }
+                })
+            }
+        })
+
+        app.mount('#app')
+    </script>
+</body>
+
+</html>

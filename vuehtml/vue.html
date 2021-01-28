@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue知识点</title>
+    <script src="https://unpkg.com/vue@next"></script>
+    <script src="https://unpkg.com/lodash@4.17.20/lodash.min.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <!-- 组件注册 -->
+        <save-button @enlarge-text="enlargeText"></save-button>
+        <hr />
+        <!-- Props $attrs -->
+        <date-picker data-status="activated"></date-picker>
+        <hr />
+        <date-picker2 @change="showChange"></date-picker2>
+        <hr />
+        <!-- 自定义事件 -->
+        <my-component v-model="bar" placeholder="请输入" v-focus></my-component>
+        <hr />
+        <my-component2 v-model.capitalize="myText"></my-component2>
+        <div>{{myText}}</div>
+        <hr />
+        <!-- 具名插槽 -->
+        <slot-compontent>
+            <template v-slot:header="slotProps">
+                <h1>我是头部{{slotProps.value}}</h1>
+            </template>
+            <template v-slot:footer="slotProps">
+                <h3>我是底部{{slotProps.value}}</h3>
+            </template>
+            <template v-slot:default>
+                Submit
+            </template>
+        </slot-compontent>
+        <hr />
+        <!-- 具名插槽简写 -->
+        <slot-compontent>
+            <template #header="{value}">
+                <h1>我是头部{{value}}</h1>
+            </template>
+            <template #footer="{value}">
+                <h3>我是底部{{value}}</h3>
+            </template>
+            <template #default>
+                Submit
+            </template>
+        </slot-compontent>
+        <hr />
+        <!-- 插槽作用域 -->
+        <todo-list>
+            <template v-slot:default="slotProps">
+                <i class="fas fa-check"></i>
+                <span class="green">{{ slotProps.item }}</span>
+            </template>
+        </todo-list>
+        <hr />
+        <!-- 独占默认插槽的缩写语法 -->
+        <todo-list v-slot="slotProps">
+            <i class="fas fa-check"></i>
+            <span class="green">{{ slotProps.item }}</span>
+        </todo-list>
+        <!-- 解构插槽 Prop -->
+        <todo-list v-slot="{item}">
+            <i class="fas fa-check"></i>
+            <span class="green">{{ item }}</span>
+        </todo-list>
+        <hr />
+        <!-- 异步组件 -->
+        <async-example></async-example>
+
+    </div>
+    <script>
+        const myMixin = {
+            created() {
+                console.log('mixin hook called')
+                this.hello()
+            },
+            methods: {
+                hello() {
+                    console.log('hello from mixin!')
+                }
+            }
+        }
+        const app = Vue.createApp({
+            mixins: [myMixin],
+            data() {
+                return {
+                    bar: '555',
+                    myText: ''
+                }
+            },
+            created() {
+                console.log('component hook called')
+            },
+            watch: {
+                bar: {
+                    handler(old, newValue) {
+                        // console.log(this.bar)
+                    }
+                }
+            },
+            methods: {
+                enlargeText(value) {
+                    // console.log('我收到了' + value)
+                },
+                showChange(value) {
+                    // console.log(event.target.value)
+                }
+            }
+        })
+
+        app.component('save-button', {
+            emits: ['enlarge-text'],
+            created() {
+                // 用 Lodash 的防抖函数
+                this.debouncedClick = _.debounce(this.click2, 500)
+            },
+            unmounted() {
+                // 移除组件时，取消定时器
+                this.debouncedClick.cancel()
+            },
+            methods: {
+                click2() {
+                    // ... 响应点击 ...
+                    //console.log(1)
+                    this.$emit('enlarge-text', 1)
+                }
+            },
+            template: `
+                <button @click="debouncedClick">
+                Save
+                </button>
+        `
+        })
+
+        app.component('date-picker', {
+            created() {
+                // console.log(this.$attrs)
+            },
+            template: `
+                <div class="date-picker">
+                <input type="datetime" />
+                </div>
+            `
+        })
+        app.component('date-picker3', {
+            inheritAttrs: false,
+            created() {
+                // console.log(this.$attrs)
+            },
+            template: `
+                <div class="date-picker">
+                <input type="datetime" v-bind="$attrs"/>
+                </div>
+            `
+        })
+        app.component('date-picker2', {
+            created() {
+                // console.log(this.$attrs)
+            },
+            template: `
+                    <select>
+                    <option value="1">Yesterday</option>
+                    <option value="2">Today</option>
+                    <option value="3">Tomorrow</option>
+                    </select>
+                `
+        })
+        app.component('my-component', {
+            inheritAttrs: false,
+            props: {
+                modelValue: String
+            },
+            template: `
+                <input 
+                v-bind="$attrs"
+                type="text"
+                :value="modelValue"
+                @input="$emit('update:modelValue', $event.target.value)">
+            `
+        })
+
+        app.component('my-component2', {
+            props: {
+                modelValue: String,
+                modelModifiers: {
+                    default: () => ({})
+                }
+            },
+            methods: {
+                emitValue(e) {
+                    let value = e.target.value
+                    if (this.modelModifiers.capitalize) {
+                        value = value.charAt(0).toUpperCase() + value.slice(1)
+                    }
+                    this.$emit('update:modelValue', value)
+                }
+            },
+            template: `<input
+            type="text"
+            :value="modelValue"
+            @input="emitValue">`
+        })
+
+        app.component('slot-compontent', {
+            data() {
+                return {
+                    header: 'Header',
+                    footer: 'Hooter'
+                }
+            },
+            template: `
+               <div>
+                    <header>
+                        <slot name="header" :value="header"></slot>
+                    </header>
+                    <footer>
+                        <slot name="footer" :value="footer"></slot>
+                    </footer>
+                    <button>
+                        <slot>提交</slot>
+                    </button>
+                </div>
+            `
+        })
+        app.component('todo-list', {
+            data() {
+                return {
+                    items: ['Feed a cat', 'Buy milk']
+                }
+            },
+            template: `
+            <ul>
+            <li v-for="(item, index) in items">
+                <slot :item="item"></slot>
+            </li>
+            </ul>
+        `
+        })
+
+        const AsyncComp = Vue.defineAsyncComponent(
+            () =>
+            new Promise((resolve, reject) => {
+                resolve({
+                    template: '<div>I am async!</div>'
+                })
+                // reject('渲染错误')
+            })
+        )
+
+        // 注册一个全局自定义指令 `v-focus`
+        app.directive('focus', {
+        // 当被绑定的元素插入到 DOM 中时……
+        mounted(el) {
+            // Focus the element
+            el.focus()
+        }
+        })
+
+        app.component('async-example', AsyncComp)
+        
+        app.mount('#app')
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>全局混入</title>
+    <script src="https://unpkg.com/vue@next"></script>
+    <script src="https://unpkg.com/lodash@4.17.20/lodash.min.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <test-component></test-component>
+    </div>
+    <script>
+        const app = Vue.createApp({
+           myOption: 'hello!'
+        })
+
+        // 为自定义的选项 'myOption' 注入一个处理器。
+        app.mixin({
+            created() {
+                const myOption = this.$options.myOption
+                if (myOption) {
+                  console.log(myOption)
+                }
+            }
+        })
+
+        // 将myOption也添加到子组件
+        app.component('test-component', {
+           myOption: 'hello from component!'
+        })
+
+        app.mount('#app')
+    </script>
+</body>
+
+</html>
