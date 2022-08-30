@@ -25,7 +25,7 @@
     "sass": "^1.32.4",
     "ts-jest": "^26.4.4",
     "typescript": "3.9.7",
-    "vite": "^1.0.0-rc.13",
+    "vite": "^2.9.13",
     "vue-jest": "^5.0.0-alpha.7"
   },
   "main": "index.js",
